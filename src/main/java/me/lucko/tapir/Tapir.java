@@ -1,5 +1,5 @@
 /*
- * This file is part of Tapir, licensed under the MIT License.
+ * This file is part of tapir, licensed under the MIT License.
  *
  *  Copyright (c) lucko (Luck) <luck@lucko.me>
  *  Copyright (c) contributors
@@ -74,12 +74,10 @@ import java.util.stream.Collectors;
 
 @Plugin(
         id = "tapir",
-        name = "Tapir",
-        version = "1.0-SNAPSHOT",
-        description = "JavaScript plugins using Nashorn",
-        authors = {
-                "Luck"
-        }
+        name = "tapir",
+        version = "1.0.0",
+        description = "tapir is a script-loading system which lets you create JavaScript plugins for the Sponge API.",
+        authors = {"Luck"}
 )
 public class Tapir {
 
@@ -121,7 +119,7 @@ public class Tapir {
         // create default config
         if (!Files.exists(this.configFile)) {
             CommentedConfigurationNode configuration = this.configLoader.createEmptyNode(
-                    this.configLoader.getDefaultOptions().setHeader("Tapir - JavaScript plugins using Nashorn\nMade with <3 by Luck")
+                    this.configLoader.getDefaultOptions().setHeader("tapir configuration\nMade with <3 by Luck")
             );
 
             CommentedConfigurationNode directoryNode = configuration.getNode("script-directory");
@@ -130,11 +128,11 @@ public class Tapir {
 
             CommentedConfigurationNode initScriptNode = configuration.getNode("init-script");
             initScriptNode.setValue("init.js");
-            initScriptNode.setComment("The name of the initial script.");
+            initScriptNode.setComment("The name of the initialisation script.");
 
             CommentedConfigurationNode pollIntervalNode = configuration.getNode("poll-interval");
             pollIntervalNode.setValue(1);
-            pollIntervalNode.setComment("How often script files should be polled for changes. Defined as a time in seconds.");
+            pollIntervalNode.setComment("How often should script files should be polled for changes. Defined as a time in seconds.");
 
             try {
                 this.configLoader.save(configuration);
@@ -200,7 +198,7 @@ public class Tapir {
     }
 
     /**
-     * Script bindings for helper utilities
+     * Script bindings for general sponge classes
      */
     public static class SpongeScriptBindings implements BindingsSupplier {
 
@@ -223,6 +221,9 @@ public class Tapir {
         }
     }
 
+    /**
+     * Script bindings provided by tapir
+     */
     private class TapirScriptBindings implements BindingsSupplier {
 
         @Override

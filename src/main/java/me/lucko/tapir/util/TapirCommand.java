@@ -1,5 +1,5 @@
 /*
- * This file is part of Tapir, licensed under the MIT License.
+ * This file is part of tapir, licensed under the MIT License.
  *
  *  Copyright (c) lucko (Luck) <luck@lucko.me>
  *  Copyright (c) contributors
@@ -89,6 +89,10 @@ public class TapirCommand implements CommandCallable {
     }
 
     private Optional<Text> getTextMember(String memberName) {
+        if (this.scriptObject.hasMember(memberName)) {
+            return Optional.empty();
+        }
+
         Object val = this.scriptObject.getMember(memberName);
         if (val == null) {
             return Optional.empty();
