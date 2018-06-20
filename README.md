@@ -1,28 +1,24 @@
-# Tapir
-JavaScript plugins using Nashorn for the Sponge API
+![tapir](https://i.imgur.com/J1aNl5U.png)
 
-![](https://i.imgur.com/rV6xnD9.png)
+tapir is a script-loading system which lets you create JavaScript plugins for the Sponge API.
 
+### about
 
-### Status
+* tapir uses the Nashorn JavaScript library (introduced in Java 8) to handle execution of the JS code
+* [ScriptController](https://github.com/lucko/ScriptController) is used to handle most of the script loading logic.
 
-Still very much a WIP.
+### features
 
-"Tapir" is just the name of the plugin. It's because tapirs are part of the same family as rhinos, which is where the name "nashorn" comes from.
+* Write code in JavaScript using all of the same APIs you'd have access to in a Java plugin!
+* Changes to script files are detected and applied automagically - just hit the save button "save" on your text editor
+* Code can be hotswapped at runtime - you can completely change the behaviour of a command/listener/whatever without restarting or reloading the server.
 
-This project uses [ScriptController](https://github.com/lucko/ScriptController) to handle most of the script loading logic.
+### the not-so-good bits
 
-### Why bother?
+* It's JavaScript - that means no type safety, no IDEs that autocomplete most things for you, no way to know that your code is going to run properly before you actually try running it.
+* If you want script reloading to work nicely, you have to program with it in mind. State that should be preserved between reloads has to be exported, and any custom listeners or registrations have to be bound to the script instance. It's not hard or time-consuming to do, you've just got to remember to do it! 
 
-Aside from being a fun project to work on, there are some benefits to using Nashorn.
-
-* You can reload scripts at runtime just by editing a file - like you would a config.
-* Code can be very easily hotswapped - you can change the behaviour of a command/listener/whatever without restarting or reloading your server.
-
-It's great for rapidly testing changes and playing with the API. You lose the advantages of type safety (and an ide that does most of the work for you) in return for being able to make changes within seconds.
-
-
-### Example
+### examples
 
 Example of a simple event listener and command.
 
@@ -31,16 +27,15 @@ logger.info("Hello World!");
 
 registerListener(ClientConnectionEvent.Join.class, Order.EARLY, function(e) {
     var player = e.getTargetEntity();
-
     var message = Text.builder("Hello and welcome to my server!").color(TextColors.GREEN).build();
     player.sendMessage(message);
 })
 
 var command = {
     "process": function(source, arguments) {
-        //source.gameMode().set(GameModes.CREATIVE);
-
-        var message = Text.builder("you a big big dummy").color(TextColors.GREEN).build();
+        source.gameMode().set(GameModes.CREATIVE);
+        
+        var message = Text.builder("You are now in creative mode!").color(TextColors.GREEN).build();
         source.sendMessage(message);
 
         return CommandResult.success();
@@ -49,12 +44,12 @@ var command = {
         return ["foo", "bar"];
     },
     "testPermission": function(source) {
-        return source.hasPermission("dummy.permission");
+        return source.hasPermission("myplugin.cheat");
     },
-    "shortDescription": "A short description.",
-    "help": "<insert super useful message here>",
-    "usage": "/dummy"
+    "shortDescription": "Enable a super-secret cheat mode. Do it, I dare you!",
+    "help": "<insert super useful help message here>",
+    "usage": "/cheat"
 }
 
-registerCommand(command, "dummy");
+registerCommand(command, "cheat");
 ```
