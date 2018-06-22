@@ -25,6 +25,7 @@
 
 package me.lucko.tapir;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 
 import me.lucko.scriptcontroller.ScriptController;
@@ -271,6 +272,8 @@ public class Tapir {
             } else {
                 consumer = (ScriptObjectMirror) args[1];
             }
+
+            Preconditions.checkState(consumer.isFunction(), "consumer must be a function");
 
             TapirEventSubscription<?> subscription = new TapirEventSubscription<>(Tapir.this, clazz, order, (Consumer<Event>) event -> consumer.call(this, event));
             this.script.getClosables().bind(subscription);

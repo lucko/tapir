@@ -25,6 +25,8 @@
 
 package me.lucko.tapir.util;
 
+import com.google.common.base.Preconditions;
+
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -48,6 +50,7 @@ public class TapirCommand implements CommandCallable {
 
     public TapirCommand(ScriptObjectMirror scriptObject) {
         this.scriptObject = scriptObject;
+        Preconditions.checkState(this.scriptObject.hasMember("process"), "object is missing a 'process' member");
     }
 
     @Override
