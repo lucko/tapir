@@ -36,8 +36,8 @@ import me.lucko.scriptcontroller.environment.loader.ScriptLoadingExecutor;
 import me.lucko.scriptcontroller.environment.script.Script;
 import me.lucko.scriptcontroller.environment.settings.EnvironmentSettings;
 import me.lucko.scriptcontroller.logging.SystemLogger;
-import me.lucko.tapir.util.TapirEventSubscription;
 import me.lucko.tapir.util.TapirCommand;
+import me.lucko.tapir.util.TapirEventSubscription;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -49,6 +49,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.AsynchronousExecutor;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.SynchronousExecutor;
@@ -104,11 +105,14 @@ public class Tapir {
 
     @Inject
     @SynchronousExecutor
-    SpongeExecutorService syncExecutor;
+    private SpongeExecutorService syncExecutor;
 
     @Inject
     @AsynchronousExecutor
-    SpongeExecutorService asyncExecutor;
+    private SpongeExecutorService asyncExecutor;
+
+    @Inject
+    private PluginContainer pluginContainer;
 
     private ScriptController controller;
     private ScriptEnvironment environment;
@@ -171,7 +175,13 @@ public class Tapir {
                 .logger(new SpongeSystemLogger())
                 .defaultEnvironmentSettings(EnvironmentSettings.builder()
                         .loadExecutor(ScriptLoadingExecutor.usingJavaScheduler(this.asyncExecutor))
-                        .runExecutor(this.syncExecutor)
+                        .runExecutor(command -> {
+                            if (Sponge.getServer().isMainThread()) {
+                                command.run();
+                            } else {
+                                this.syncExecutor.execute(command);
+                            }
+                        })
                         .pollRate(configuration.getNode("poll-interval").getLong(1), TimeUnit.SECONDS)
                         .initScript(configuration.getNode("init-script").getString("init.js"))
                         .withBindings(new SpongeScriptBindings())
@@ -231,6 +241,9 @@ public class Tapir {
         public void supplyBindings(Script script, BindingsBuilder bindings) {
             bindings.put("registerListener", new RegisterListenerFunction(script));
             bindings.put("registerCommand", new RegisterCommandFunction(script));
+
+            bindings.put("pluginContainer", Tapir.this.pluginContainer);
+            bindings.put("pluginInstance", Tapir.this);
         }
     }
 
