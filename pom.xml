@@ -6,7 +6,7 @@
 
     <groupId>me.lucko</groupId>
     <artifactId>tapir</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>tapir</name>
@@ -24,7 +24,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -36,8 +36,12 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
                                 <relocation>
-                                    <pattern>io.github.lukehutch.fastclasspathscanner</pattern>
-                                    <shadedPattern>me.lucko.tapir.external.fcs</shadedPattern>
+                                    <pattern>io.github.classgraph</pattern>
+                                    <shadedPattern>me.lucko.tapir.external.classgraph</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>nonapi.io.github.classgraph</pattern>
+                                    <shadedPattern>me.lucko.tapir.external.classgraph.nonapi</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
@@ -75,20 +79,20 @@
         <dependency>
             <groupId>me.lucko</groupId>
             <artifactId>scriptcontroller</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>io.github.lukehutch</groupId>
-            <artifactId>fast-classpath-scanner</artifactId>
-            <version>2.9.5</version>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+            <version>4.6.9</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.spongepowered</groupId>
             <artifactId>spongeapi</artifactId>
-            <version>6.0.0</version>
+            <version>7.1.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

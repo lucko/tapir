@@ -56,7 +56,8 @@ import org.spongepowered.api.scheduler.SynchronousExecutor;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
-import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.PackageInfo;
 import jdk.nashorn.api.scripting.AbstractJSObject;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -77,7 +78,7 @@ import java.util.stream.Collectors;
 @Plugin(
         id = "tapir",
         name = "tapir",
-        version = "1.0.0",
+        version = "1.1.0",
         description = "tapir is a script-loading system which lets you create JavaScript plugins for the Sponge API.",
         authors = {"Luck"}
 )
@@ -156,17 +157,15 @@ public class Tapir {
 
         // search for packages which match the default import patterns
         this.logger.info("Scanning the classpath to resolve default package imports...");
-        FastClasspathScanner classpathScanner = new FastClasspathScanner(DEFAULT_IMPORTS).strictWhitelist()
+
+        ClassGraph classGraph = new ClassGraph()
+                .whitelistPackages(DEFAULT_IMPORTS)
                 .addClassLoader(Sponge.class.getClassLoader());
 
-        // form a list of matches packages
-        Set<String> defaultPackages = classpathScanner.scan()
-                .getNamesOfAllClasses()
+        Set<String> defaultPackages = classGraph.scan()
+                .getPackageInfo()
                 .stream()
-                .map(className -> {
-                    // convert to a package name
-                    return className.substring(0, className.lastIndexOf('.'));
-                })
+                .map(PackageInfo::getName)
                 .collect(Collectors.toSet());
 
         // setup the script controller
